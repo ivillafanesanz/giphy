@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Animal Buttons</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="style.css" /> -->
+    <style type="text/css">
+        .image {
+            margin: 5px;
+        }
+        .animals{
+            color: white;
+            background-color: white;
+
+
+        }
+
+        
+    </style>
+</head>
+
+<body>
+
+    <div id="buttonLocation"></div>
+    <form>
+
+        <input type="text" id="text" />
+        <input type="submit" id="submit" />
+
+    </form>
+
+
+
+    <div class=row id="gifs-appear-here"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+        var animalsArray = ["cats", "dogs", "birds"];
+        makeItWork();
+
+        $('#submit').on("click", function () {
+            event.preventDefault();
+
+            var written = $("#text").val();
+
+            animalsArray.push(written);
+            makeItWork();
+
+
+
+
+        });
+
+        function makeItWork() {
+            $("#buttonLocation").empty();
+            for (var i = 0; i < animalsArray.length; i++) {
+
+                var buttons = $('<button>');
+                buttons.html(animalsArray[i]).attr("class", "animals").val(animalsArray[i]);
+                $("#buttonLocation").append(buttons);
+
+            }
+
+
+
+        }
+
+        $(document).on("click", ".animals", function () {
+            var choice = this.value
+            console.log(choice);
+
+            var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+                choice + "&api_key=dc6zaTOxFJmzC&limit=10";
+
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).then(function (response) {
+                console.log(response);
+                var results = response.data;
+                var dataAnimate
+                var dataStill
+
+
+
+                for (var i = 0; i < results.length; i++) {
+
+
+                    var animalDiv = $("<div>");
+                    // Make a paragraph tag with jQuery and store it in a variable named p.
+                    var p = $("<p>");
+                    p.text("Rating of the image: " + results[i].rating);
+                    // Set the inner text of the paragraph to the rating of the image in results[i].
+                    // Make an image tag with jQuery and store it in a variable named animalImage.
+                    var animalImage = $("<img>");
+                    // Set the image's src to results[i]'s fixed_height.url.
+                    animalImage.attr("src", results[i].images.fixed_height.url);
+                    animalImage.attr("data-state", "animate");
+                    animalImage.attr("data-still", results[i].images.original_still.url);
+                    animalImage.attr("data-animate", results[i].images.fixed_height.url)
+                    animalImage.addClass("image");
+                    // Append the p variable to the animalDiv variable.
+                    animalDiv.prepend(p);
+                    // Append the animalImage variable to the animalDiv variable.
+                    animalDiv.prepend(animalImage);
+                    // Prepend the animalDiv variable to the element with an id of gifs-appear-here.
+                    $("#gifs-appear-here").prepend(animalDiv);
+
+                    dataStill = results[i].images.original_still.url;
+
+                    dataAnimate = results[i].images.fixed_height.url;
+
+                    // return dataStill;
+                    // return dataAnimate;
+
+
+                }
+
+                // function sum() {
+                //     var x, y;
+                //     return x + y;
+                // }
+
+                // var globalsum = sum();
+
+
+                $(document).on("click", ".image", function () {
+                    // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
+
+                    var state = $(this).attr("data-state");
+                    console.log($(this).attr("data-still"));
+                    // If the clicked image's state is still, update its src attribute to what its data-animate value is.
+                    // Then, set the image's data-state to animate
+                    // Else set src to the data-still value
+                    if (state === "animate") {
+                        $(this).attr("src", $(this).attr("data-still"));
+                        $(this).attr("data-state", "still");
+                    } else {
+                        $(this).attr("src", $(this).attr("data-animate"));
+                        $(this).attr("data-state", "animate");
+                    }
+                });
+
+
+
+
+
+
+            })
+        });
+
+
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>
